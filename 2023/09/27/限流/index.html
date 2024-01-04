@@ -27,7 +27,7 @@
 <meta property="og:site_name" content="Hexo">
 <meta property="og:description" content="在分布式系统中，如果某个服务节点发生故障或者网络发生异常，都有可能导致调用方被阻塞等待，如果超时时间设置很长，调用方资源很可能被耗尽。这又导致了调用方的上游系统发生资源耗尽的情况，最终导致系统雪崩。 如下图： 如果D服务发生了故障不能响应，B服务调用D时只能阻塞等待。假如B服务调用D服务设置超时时间是10秒，请求速率是每秒100个，那10秒内就会有1000个请求线程被阻塞等待，如果B的线程池大小设">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://ucc.alicdn.com/pic/developer-ecology/3d56ead76504451a9b919df932ec22de.png">
+<meta property="og:image" content="https://kisslei.github.io/ee/images/3d56ead76504451a9b919df932ec22de.png">
 <meta property="og:image" content="https://ucc.alicdn.com/pic/developer-ecology/19612784ae8945bb88fb179bb423521f.png">
 <meta property="og:image" content="https://ucc.alicdn.com/pic/developer-ecology/c6f19c27138d4f14a1f9bf77d619534b.png">
 <meta property="og:image" content="https://ucc.alicdn.com/pic/developer-ecology/380a9c506a654f39b4ca25f00dae57a3.png">
@@ -38,11 +38,11 @@
 <meta property="og:image" content="https://ucc.alicdn.com/pic/developer-ecology/f4d7bb34babf48878c5c35c58f946c76.png">
 <meta property="og:image" content="https://ucc.alicdn.com/pic/developer-ecology/34614ba464b54aed8626b408e07b04bc.png">
 <meta property="article:published_time" content="2023-09-27T03:01:42.000Z">
-<meta property="article:modified_time" content="2024-01-04T03:02:46.090Z">
+<meta property="article:modified_time" content="2024-01-04T03:22:44.695Z">
 <meta property="article:author" content="John Doe">
 <meta property="article:tag" content="分布式">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://ucc.alicdn.com/pic/developer-ecology/3d56ead76504451a9b919df932ec22de.png">
+<meta name="twitter:image" content="https://kisslei.github.io/ee/images/3d56ead76504451a9b919df932ec22de.png">
 
 <link rel="canonical" href="https://kisslei.github.io/ee/2023/09/27/%E9%99%90%E6%B5%81/">
 
@@ -192,7 +192,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-01-04 11:02:46" itemprop="dateModified" datetime="2024-01-04T11:02:46+08:00">2024-01-04</time>
+                <time title="修改时间：2024-01-04 11:22:44" itemprop="dateModified" datetime="2024-01-04T11:22:44+08:00">2024-01-04</time>
               </span>
 
           
@@ -208,7 +208,7 @@
       
         <p>在分布式系统中，如果某个服务节点发生故障或者网络发生异常，都有可能导致调用方被阻塞等待，如果超时时间设置很长，调用方资源很可能被耗尽。这又导致了调用方的上游系统发生资源耗尽的情况，最终导致系统雪崩。</p>
 <p>如下图：</p>
-<p><img src="https://ucc.alicdn.com/pic/developer-ecology/3d56ead76504451a9b919df932ec22de.png" alt="微信图片_20221212182819.png">如果<code>D</code>服务发生了故障不能响应，<code>B</code>服务调用<code>D</code>时只能阻塞等待。假如<code>B</code>服务调用<code>D</code>服务设置超时时间是<code>10</code>秒，请求速率是每秒<code>100</code>个，那<code>10</code>秒内就会有<code>1000</code>个请求线程被阻塞等待，如果<code>B</code>的线程池大小设置<code>1000</code>，那<code>B</code>系统因为线程资源耗尽已经不能对外提供服务了。而这又影响了入口系统<code>A</code>的服务，最终导致系统全面崩溃。</p>
+<p><img src="/ee/images/3d56ead76504451a9b919df932ec22de.png" alt="微信图片_20221212182819.png">如果<code>D</code>服务发生了故障不能响应，<code>B</code>服务调用<code>D</code>时只能阻塞等待。假如<code>B</code>服务调用<code>D</code>服务设置超时时间是<code>10</code>秒，请求速率是每秒<code>100</code>个，那<code>10</code>秒内就会有<code>1000</code>个请求线程被阻塞等待，如果<code>B</code>的线程池大小设置<code>1000</code>，那<code>B</code>系统因为线程资源耗尽已经不能对外提供服务了。而这又影响了入口系统<code>A</code>的服务，最终导致系统全面崩溃。</p>
 <p>提高系统的整体容错能力是防止系统雪崩的有效手段。</p>
 <p>在<code>Martin Fowler</code>和<code>James Lewis</code>的文章 《Microservices: a definition of this new architectural term》[1]中，提出了微服务的<code>9</code>个特征，其中一个是容错设计。</p>
 <p>要防止系统发生雪崩，就必须要有容错设计。如果遇到突增流量，一般的做法是对非核心业务功能采用熔断和服务降级的措施来保护核心业务功能正常服务，而对于核心功能服务，则需要采用限流的措施。</p>
@@ -218,18 +218,12 @@
 <p>但是对实操性来说，按照事务来限流并不现实。在分布式系统中完成一笔事务需要多个系统的配合。比如我们在电商系统购物，需要订单、库存、账户、支付等多个服务配合完成，有的服务需要异步返回，这样完成一笔事务花费的时间可能会很长。如果按照<code>TPS</code>来进行限流，时间粒度可能会很大大，很难准确评估系统的响应性能。</p>
 <h4 id="1-1-2-HPS"><a href="#1-1-2-HPS" class="headerlink" title="1.1.2 HPS"></a>1.1.2 HPS</h4><p>每秒请求数，指每秒钟服务端收到客户端的请求数量。</p>
 <blockquote>
-<p>❝</p>
-<p>如果一个请求完成一笔事务，那<code>TPS</code>和<code>HPS</code>是等同的。但在分布式场景下，完成一笔事务可能需要多次请求，所以<code>TPS</code>和<code>HPS</code>指标不能等同看待。</p>
-<p>❞</p>
+<p>❝如果一个请求完成一笔事务，那<code>TPS</code>和<code>HPS</code>是等同的。但在分布式场景下，完成一笔事务可能需要多次请求，所以<code>TPS</code>和<code>HPS</code>指标不能等同看待。❞</p>
 </blockquote>
 <h4 id="1-1-3-QPS"><a href="#1-1-3-QPS" class="headerlink" title="1.1.3 QPS"></a>1.1.3 QPS</h4><p>服务端每秒能够响应的客户端查询请求数量。</p>
 <blockquote>
-<p>❝</p>
-<p>如果后台只有一台服务器，那<code>HPS</code>和<code>QPS</code>是等同的。但是在分布式场景下，每个请求需要多个服务器配合完成响应。</p>
-<p>❞</p>
-<p>❝</p>
-<p>目前主流的限流方法多采用<code>HPS</code>作为限流指标。</p>
-<p>❞</p>
+<p>❝如果后台只有一台服务器，那<code>HPS</code>和<code>QPS</code>是等同的。但是在分布式场景下，每个请求需要多个服务器配合完成响应。❞</p>
+<p>❝目前主流的限流方法多采用<code>HPS</code>作为限流指标。❞</p>
 </blockquote>
 <h3 id="1-2-限流方法"><a href="#1-2-限流方法" class="headerlink" title="1.2 限流方法"></a>1.2 限流方法</h3><h3 id="1-2-1-流量计数器"><a href="#1-2-1-流量计数器" class="headerlink" title="1.2.1 流量计数器"></a>1.2.1 流量计数器</h3><p>这是最简单直接的方法，比如限制每秒请求数量<code>100</code>，超过<code>100</code>的请求就拒绝掉。</p>
 <p>但是这个方法存在<code>2</code>个明显的问题：</p>
