@@ -20,28 +20,44 @@
     var CONFIG = {"hostname":"kisslei.github.io","root":"/ee/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="https://kisslei.github.io/ee/index.html">
+  <meta name="description" content="在分布式系统中，如果某个服务节点发生故障或者网络发生异常，都有可能导致调用方被阻塞等待，如果超时时间设置很长，调用方资源很可能被耗尽。这又导致了调用方的上游系统发生资源耗尽的情况，最终导致系统雪崩。 如下图： 如果D服务发生了故障不能响应，B服务调用D时只能阻塞等待。假如B服务调用D服务设置超时时间是10秒，请求速率是每秒100个，那10秒内就会有1000个请求线程被阻塞等待，如果B的线程池大小设">
+<meta property="og:type" content="article">
+<meta property="og:title" content="限流">
+<meta property="og:url" content="https://kisslei.github.io/ee/2023/09/27/%E9%99%90%E6%B5%81/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="在分布式系统中，如果某个服务节点发生故障或者网络发生异常，都有可能导致调用方被阻塞等待，如果超时时间设置很长，调用方资源很可能被耗尽。这又导致了调用方的上游系统发生资源耗尽的情况，最终导致系统雪崩。 如下图： 如果D服务发生了故障不能响应，B服务调用D时只能阻塞等待。假如B服务调用D服务设置超时时间是10秒，请求速率是每秒100个，那10秒内就会有1000个请求线程被阻塞等待，如果B的线程池大小设">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ucc.alicdn.com/pic/developer-ecology/3d56ead76504451a9b919df932ec22de.png">
+<meta property="og:image" content="https://ucc.alicdn.com/pic/developer-ecology/19612784ae8945bb88fb179bb423521f.png">
+<meta property="og:image" content="https://ucc.alicdn.com/pic/developer-ecology/c6f19c27138d4f14a1f9bf77d619534b.png">
+<meta property="og:image" content="https://ucc.alicdn.com/pic/developer-ecology/380a9c506a654f39b4ca25f00dae57a3.png">
+<meta property="og:image" content="https://ucc.alicdn.com/pic/developer-ecology/c42a66ebb1724034bca9389684217773.png">
+<meta property="og:image" content="https://ucc.alicdn.com/pic/developer-ecology/5b70860d00c347f580ccc4bfb46828bf.png">
+<meta property="og:image" content="https://ucc.alicdn.com/pic/developer-ecology/5df00778d38c4074a2f3c94716b2aed3.png">
+<meta property="og:image" content="https://ucc.alicdn.com/pic/developer-ecology/aa7f2a81e89540cabc8aef5db49f51f9.png">
+<meta property="og:image" content="https://ucc.alicdn.com/pic/developer-ecology/f4d7bb34babf48878c5c35c58f946c76.png">
+<meta property="og:image" content="https://ucc.alicdn.com/pic/developer-ecology/34614ba464b54aed8626b408e07b04bc.png">
+<meta property="article:published_time" content="2023-09-27T03:01:42.000Z">
+<meta property="article:modified_time" content="2024-01-04T03:02:46.090Z">
 <meta property="article:author" content="John Doe">
+<meta property="article:tag" content="分布式">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ucc.alicdn.com/pic/developer-ecology/3d56ead76504451a9b919df932ec22de.png">
 
-<link rel="canonical" href="https://kisslei.github.io/ee/">
+<link rel="canonical" href="https://kisslei.github.io/ee/2023/09/27/%E9%99%90%E6%B5%81/">
 
 
 <script id="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome : true,
-    isPost : false,
+    isHome : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>Hexo</title>
+  <title>限流 | Hexo</title>
   
 
 
@@ -139,9 +155,10 @@
         <div class="content-wrap">
           
 
-          <div class="content index posts-expand">
+          <div class="content post posts-expand">
             
-      
+
+    
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
@@ -157,10 +174,9 @@
       <meta itemprop="name" content="Hexo">
     </span>
       <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/ee/2023/09/27/%E9%99%90%E6%B5%81/" class="post-title-link" itemprop="url">限流</a>
-        </h2>
+        <h1 class="post-title" itemprop="name headline">
+          限流
+        </h1>
 
         <div class="post-meta">
             <span class="post-meta-item">
@@ -190,7 +206,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>在分布式系统中，如果某个服务节点发生故障或者网络发生异常，都有可能导致调用方被阻塞等待，如果超时时间设置很长，调用方资源很可能被耗尽。这又导致了调用方的上游系统发生资源耗尽的情况，最终导致系统雪崩。</p>
+        <p>在分布式系统中，如果某个服务节点发生故障或者网络发生异常，都有可能导致调用方被阻塞等待，如果超时时间设置很长，调用方资源很可能被耗尽。这又导致了调用方的上游系统发生资源耗尽的情况，最终导致系统雪崩。</p>
 <p>如下图：</p>
 <p><img src="https://ucc.alicdn.com/pic/developer-ecology/3d56ead76504451a9b919df932ec22de.png" alt="微信图片_20221212182819.png">如果<code>D</code>服务发生了故障不能响应，<code>B</code>服务调用<code>D</code>时只能阻塞等待。假如<code>B</code>服务调用<code>D</code>服务设置超时时间是<code>10</code>秒，请求速率是每秒<code>100</code>个，那<code>10</code>秒内就会有<code>1000</code>个请求线程被阻塞等待，如果<code>B</code>的线程池大小设置<code>1000</code>，那<code>B</code>系统因为线程资源耗尽已经不能对外提供服务了。而这又影响了入口系统<code>A</code>的服务，最终导致系统全面崩溃。</p>
 <p>提高系统的整体容错能力是防止系统雪崩的有效手段。</p>
@@ -328,181 +344,33 @@
 <p>对于限流，选择合理的限流算法很重要，令牌桶算法优势很明显，也是使用最多的限流算法。</p>
 <p>在系统设计的时候，这些模式需要配合业务量的预估、性能测试的数据进行相应阈值的配置，而这些阈值最好保存在配置中心，方便实时修改。</p>
 
-      
     </div>
 
     
     
     
+
       <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
+          <div class="post-tags">
+              <a href="/ee/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" rel="tag"># 分布式</a>
+          </div>
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://kisslei.github.io/ee/2023/09/20/%E4%B8%80%E8%87%B4%E6%80%A7%E5%93%88%E5%B8%8C%E7%AE%97%E6%B3%95review/">
+        
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/ee/images/avatar.gif">
-      <meta itemprop="name" content="John Doe">
-      <meta itemprop="description" content="">
-    </span>
 
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hexo">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/ee/2023/09/20/%E4%B8%80%E8%87%B4%E6%80%A7%E5%93%88%E5%B8%8C%E7%AE%97%E6%B3%95review/" class="post-title-link" itemprop="url">一致性哈希算法review</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-09-20 21:37:59" itemprop="dateCreated datePublished" datetime="2023-09-20T21:37:59+08:00">2023-09-20</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-01-04 11:02:12" itemprop="dateModified" datetime="2024-01-04T11:02:12+08:00">2024-01-04</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <blockquote>
-<p><strong>摘要：</strong>一致性哈希是什么，使用场景，解决了什么问题？</p>
-</blockquote>
-<h2 id="如何分配请求？"><a href="#如何分配请求？" class="headerlink" title="如何分配请求？"></a>如何分配请求？</h2><p>大多数网站背后肯定不是只有一台服务器提供服务，因为单机的并发量和数据量都是有限的，所以都会用多台服务器构成集群来对外提供服务。</p>
-<p>但是问题来了，现在有那么多个节点（后面统称服务器为节点，因为少一个字），要如何分配客户端的请求呢？</p>
-<p><img src="https://alliance-communityfile-drcn.dbankcdn.com/FileServer/getFile/cmtybbs/029/274/683/0080086000029274683.20220224142345.49748461546026794375751830307421:50540619125246:2800:6BA502A314B8D068475C684AE81A2713EF6CE0D7CF0998C174AE971049A47F27.png" alt="cke_129.png"></p>
-<p>其实这个问题就是「负载均衡问题」。解决负载均衡问题的算法很多，不同的负载均衡算法，对应的就是不同的分配策略，适应的业务场景也不同。</p>
-<p>最简单的方式，引入一个中间的负载均衡层，让它将外界的请求「轮流」的转发给内部的集群。比如集群有 3 个节点，外界请求有 3 个，那么每个节点都会处理 1 个请求，达到了分配请求的目的。</p>
-<p><img src="https://alliance-communityfile-drcn.dbankcdn.com/FileServer/getFile/cmtybbs/029/274/683/0080086000029274683.20220224142345.21441399349563479193282675292368:50540619125246:2800:354AAF58B14AB2A527A30C67D80CF1B3F63DC55873FB7546B841B4C49D93FB7D.png" alt="cke_130.png"></p>
-<p>考虑到每个节点的硬件配置有所区别，我们可以引入权重值，将硬件配置更好的节点的权重值设高，然后根据各个节点的权重值，按照一定比重分配在不同的节点上，让硬件配置更好的节点承担更多的请求，这种算法叫做加权轮询。</p>
-<p>加权轮询算法使用场景是建立在每个节点存储的数据都是相同的前提。所以，每次读数据的请求，访问任意一个节点都能得到结果。</p>
-<p>但是，加权轮询算法是无法应对「分布式系统」的，因为分布式系统中，每个节点存储的数据是不同的。</p>
-<p>当我们想提高系统的容量，就会将数据水平切分到不同的节点来存储，也就是将数据分布到了不同的节点。比如<strong>一个分布式 KV（key-valu） 缓存系统，某个 key 应该到哪个或者哪些节点上获得，应该是确定的</strong>，不是说任意访问一个节点都可以得到缓存结果的。</p>
-<p>因此，我们要想一个能应对分布式系统的负载均衡算法。</p>
-<h2 id="使用哈希算法有什么问题？"><a href="#使用哈希算法有什么问题？" class="headerlink" title="使用哈希算法有什么问题？"></a>使用哈希算法有什么问题？</h2><p>有的同学可能很快就想到了：<strong>哈希算法</strong>。因为对同一个关键字进行哈希计算，每次计算都是相同的值，这样就可以将某个 key 确定到一个节点了，可以满足分布式系统的负载均衡需求。</p>
-<p>哈希算法最简单的做法就是进行取模运算，比如分布式系统中有 3 个节点，基于 hash(key) % 3 公式对数据进行了映射。</p>
-<p>如果客户端要获取指定 key 的数据，通过下面的公式可以定位节点：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">hash</span>(key) % <span class="number">3</span>复制</span><br></pre></td></tr></table></figure>
-
-<p>如果经过上面这个公式计算后得到的值是 0，就说明该 key 需要去第一个节点获取。</p>
-<p>但是有一个很致命的问题，<strong>如果节点数量发生了变化，也就是在对系统做扩容或者缩容时，必须迁移改变了映射关系的数据</strong>，否则会出现查询不到数据的问题。</p>
-<p>举个例子，假设我们有一个由 A、B、C 三个节点组成分布式 KV 缓存系统，基于计算公式 hash(key) % 3 将数据进行了映射，每个节点存储了不同的数据：</p>
-<p><img src="https://alliance-communityfile-drcn.dbankcdn.com/FileServer/getFile/cmtybbs/029/274/683/0080086000029274683.20220224142345.38700718499022062532107242283917:50540619125246:2800:7E9B326301C16DC03E784913AD0D9D09FDA18E55DC89D6D5D083CD7EFC8C428B.png" alt="cke_131.png"></p>
-<p>现在有 3 个查询 key 的请求，分别查询 key-01，key-02，key-03 的数据，这三个 key 分别经过 hash() 函数计算后的值为 hash( key-01) &#x3D; 6、hash( key-02) &#x3D; 7、hash(key-03) &#x3D; 8，然后再对这些值进行取模运算。</p>
-<p>通过这样的哈希算法，每个 key 都可以定位到对应的节点。</p>
-<p><img src="https://alliance-communityfile-drcn.dbankcdn.com/FileServer/getFile/cmtybbs/029/274/683/0080086000029274683.20220224142345.05402320189097569600852130570416:50540619125246:2800:F713B4F253E67DCF4811DF82A1219A5573D213C8A68C64F6A79A681A78CED77B.png" alt="cke_132.png"></p>
-<p>当 3 个节点不能满足业务需求了，这时我们增加了一个节点，节点的数量从 3 变化为 4，意味取模哈希函数中基数的变化，这样会导致<strong>大部分映射关系改变</strong>，如下图：</p>
-<p><img src="https://alliance-communityfile-drcn.dbankcdn.com/FileServer/getFile/cmtybbs/029/274/683/0080086000029274683.20220224142345.08376670921890512447466509274995:50540619125246:2800:C9D67978FC1DCD8CD866E6EC836F18155A3FCC93C91FE29563D72DF915B483AC.png" alt="cke_133.png"></p>
-<p>比如，之前的 hash(key-01) % 3 &#x3D; 0，就变成了 hash(key-01) % 4 &#x3D; 2，查询 key-01 数据时，寻址到了节点 C，而 key-01 的数据是存储在节点 A 上的，不是在节点 C，所以会查询不到数据。</p>
-<p>同样的道理，如果我们对分布式系统进行缩容，比如移除一个节点，也会因为取模哈希函数中基数的变化，可能出现查询不到数据的问题。</p>
-<p>要解决这个问题的办法，就需要我们进行<strong>迁移数据</strong>，比如节点的数量从 3 变化为 4 时，要基于新的计算公式 hash(key) % 4 ，重新对数据和节点做映射。</p>
-<p>假设总数据条数为 M，哈希算法在面对节点数量变化时，**最坏情况下所有数据都需要迁移，所以它的数据迁移规模是 O(M)**，这样数据的迁移成本太高了。</p>
-<p>所以，我们应该要重新想一个新的算法，来避免分布式系统在扩容或者缩容时，发生过多的数据迁移。</p>
-<h2 id="使用一致性哈希算法有什么问题？"><a href="#使用一致性哈希算法有什么问题？" class="headerlink" title="使用一致性哈希算法有什么问题？"></a>使用一致性哈希算法有什么问题？</h2><p>一致性哈希算法就很好地解决了分布式系统在扩容或者缩容时，发生过多的数据迁移的问题。</p>
-<p>一致哈希算法也用了取模运算，但与哈希算法不同的是，哈希算法是对节点的数量进行取模运算，而<strong>一致哈希算法是对 2^32 进行取模运算，是一个固定的值</strong>。</p>
-<p>我们可以把一致哈希算法是对 2^32 进行取模运算的结果值组织成一个圆环，就像钟表一样，钟表的圆可以理解成由 60 个点组成的圆，而此处我们把这个圆想象成由 2^32 个点组成的圆，这个圆环被称为<strong>哈希环</strong>，如下图：</p>
-<p><img src="https://alliance-communityfile-drcn.dbankcdn.com/FileServer/getFile/cmtybbs/029/274/683/0080086000029274683.20220224142345.49905909342456556252594602442636:50540619125246:2800:170C163BD636C9ADF3297312AAB01CC1B658185DA302A7E8F01698350E3EAA3D.png" alt="cke_134.png"></p>
-<p>一致性哈希要进行两步哈希：</p>
-<ul>
-<li>第一步：对存储节点进行哈希计算，也就是对存储节点做哈希映射，比如根据节点的 IP 地址进行哈希；</li>
-<li>第二步：当对数据进行存储或访问时，对数据进行哈希映射；</li>
-</ul>
-<p>所以，<strong>一致性哈希是指将「存储节点」和「数据」都映射到一个首尾相连的哈希环上</strong>。</p>
-<p>问题来了，对「数据」进行哈希映射得到一个结果要怎么找到存储该数据的节点呢？</p>
-<p>答案是，映射的结果值往<strong>顺时针的方向的找到第一个节点</strong>，就是存储该数据的节点。</p>
-<p>举个例子，有 3 个节点经过哈希计算，映射到了如下图的位置：</p>
-<p><img src="https://alliance-communityfile-drcn.dbankcdn.com/FileServer/getFile/cmtybbs/029/274/683/0080086000029274683.20220224142345.64910556948748364995688945396415:50540619125246:2800:B8C389182E8F2C65FDF133067F13969599B59CEB6424775488F3CD5F32E95EE8.png" alt="cke_135.png"></p>
-<p>接着，对要查询的 key-01 进行哈希计算，确定此 key-01 映射在哈希环的位置，然后从这个位置往顺时针的方向找到第一个节点，就是存储该 key-01 数据的节点。</p>
-<p>比如，下图中的 key-01 映射的位置，往顺时针的方向找到第一个节点就是节点 A。</p>
-<p><img src="https://alliance-communityfile-drcn.dbankcdn.com/FileServer/getFile/cmtybbs/029/274/683/0080086000029274683.20220224142345.48925205423244001186833948051174:50540619125246:2800:BAE8DFEED7763C6BCF4BD228794ED5A1EB21AB5BC7949EFAA30396F9E84F83DB.png" alt="cke_136.png"></p>
-<p>所以，当需要对指定 key 的值进行读写的时候，要通过下面 2 步进行寻址：</p>
-<ul>
-<li>首先，对 key 进行哈希计算，确定此 key 在环上的位置；</li>
-<li>然后，从这个位置沿着顺时针方向走，遇到的第一节点就是存储 key 的节点。</li>
-</ul>
-<p>知道了一致哈希寻址的方式，我们来看看，如果增加一个节点或者减少一个节点会发生大量的数据迁移吗？</p>
-<p>假设节点数量从 3 增加到了 4，新的节点 D 经过哈希计算后映射到了下图中的位置：</p>
-<p><img src="https://alliance-communityfile-drcn.dbankcdn.com/FileServer/getFile/cmtybbs/029/274/683/0080086000029274683.20220224142345.44801180464369279645436531216471:50540619125246:2800:644466C0CB4FBC168F5179ADA07E9D885ECABE4203646B0CEF7541AF55DCB792.png" alt="cke_137.png"></p>
-<p>你可以看到，key-01、key-03 都不受影响，只有 key-02 需要被迁移节点 D。</p>
-<p>假设节点数量从 3 减少到了 2，比如将节点 A 移除：</p>
-<p><img src="https://alliance-communityfile-drcn.dbankcdn.com/FileServer/getFile/cmtybbs/029/274/683/0080086000029274683.20220224142345.38020773364432785767431261937035:50540619125246:2800:67D84C4C7F792DC971AC39A2E271C7ADC346E55160B7BE1A4E0B577F7FF09EBF.png" alt="cke_138.png"></p>
-<p>你可以看到，key-02 和 key-03 不会受到影响，只有 key-01 需要被迁移节点 B。</p>
-<p>因此，<strong>在一致哈希算法中，如果增加或者移除一个节点，仅影响该节点在哈希环上顺时针相邻的后继节点，其它数据也不会受到影响</strong>。</p>
-<p>上面这些图中 3 个节点映射在哈希环还是比较分散的，所以看起来请求都会「均衡」到每个节点。</p>
-<p>但是<strong>一致性哈希算法并不保证节点能够在哈希环上分布均匀</strong>，这样就会带来一个问题，会有大量的请求集中在一个节点上。</p>
-<p>比如，下图中 3 个节点的映射位置都在哈希环的右半边：</p>
-<p><img src="https://alliance-communityfile-drcn.dbankcdn.com/FileServer/getFile/cmtybbs/029/274/683/0080086000029274683.20220224142344.29294315601409093906451447835272:50540619125246:2800:F92048CAF2CB881EBC5CD3F8D918363E8CA9D23D925A8977FEEE72013D5F5CEE.png" alt="cke_139.png"></p>
-<p>这时候有一半以上的数据的寻址都会找节点 A，也就是访问请求主要集中的节点 A 上，这肯定不行的呀，说好的负载均衡呢，这种情况一点都不均衡。</p>
-<p>另外，在这种节点分布不均匀的情况下，进行容灾与扩容时，哈希环上的相邻节点容易受到过大影响，容易发生雪崩式的连锁反应。</p>
-<p>比如，上图中如果节点 A 被移除了，当节点 A 宕机后，根据一致性哈希算法的规则，其上数据应该全部迁移到相邻的节点 B 上，这样，节点 B 的数据量、访问量都会迅速增加很多倍，一旦新增的压力超过了节点 B 的处理能力上限，就会导致节点 B 崩溃，进而形成雪崩式的连锁反应。</p>
-<p>所以，<strong>一致性哈希算法虽然减少了数据迁移量，但是存在节点分布不均匀的问题</strong>。</p>
-<h2 id="如何通过虚拟节点提高均衡度？"><a href="#如何通过虚拟节点提高均衡度？" class="headerlink" title="如何通过虚拟节点提高均衡度？"></a>如何通过虚拟节点提高均衡度？</h2><p>要想解决节点能在哈希环上分配不均匀的问题，就是要有大量的节点，节点数越多，哈希环上的节点分布的就越均匀。</p>
-<p>但问题是，实际中我们没有那么多节点。所以这个时候我们就加入<strong>虚拟节点</strong>，也就是对一个真实节点做多个副本。</p>
-<p>具体做法是，<strong>不再将真实节点映射到哈希环上，而是将虚拟节点映射到哈希环上，并将虚拟节点映射到实际节点，所以这里有「两层」映射关系。</strong></p>
-<p>比如对每个节点分别设置 3 个虚拟节点：</p>
-<ul>
-<li>对节点 A 加上编号来作为虚拟节点：A-01、A-02、A-03</li>
-<li>对节点 B 加上编号来作为虚拟节点：B-01、B-02、B-03</li>
-<li>对节点 C 加上编号来作为虚拟节点：C-01、C-02、C-03</li>
-</ul>
-<p>引入虚拟节点后，原本哈希环上只有 3 个节点的情况，就会变成有 9 个虚拟节点映射到哈希环上，哈希环上的节点数量多了 3 倍。</p>
-<p><img src="https://alliance-communityfile-drcn.dbankcdn.com/FileServer/getFile/cmtybbs/029/274/683/0080086000029274683.20220224142344.19849996208846198157435480193581:50540619125246:2800:7635F835F790DD57C3919B22EC549037B8E32A30B597E55AA0D5DD9F9EEDBD51.png" alt="cke_140.png"></p>
-<p>你可以看到，<strong>节点数量多了后，节点在哈希环上的分布就相对均匀了</strong>。这时候，如果有访问请求寻址到「A-01」这个虚拟节点，接着再通过「A-01」虚拟节点找到真实节点 A，这样请求就能访问到真实节点 A 了。</p>
-<p>上面为了方便你理解，每个真实节点仅包含 3 个虚拟节点，这样能起到的均衡效果其实很有限。而在实际的工程中，虚拟节点的数量会大很多，比如 Nginx 的一致性哈希算法，每个权重为 1 的真实节点就含有160 个虚拟节点。</p>
-<p>另外，虚拟节点除了会提高节点的均衡度，还会提高系统的稳定性。<strong>当节点变化时，会有不同的节点共同分担系统的变化，因此稳定性更高</strong>。</p>
-<p>比如，当某个节点被移除时，对应该节点的多个虚拟节点均会移除，而这些虚拟节点按顺时针方向的下一个虚拟节点，可能会对应不同的真实节点，即这些不同的真实节点共同分担了节点变化导致的压力。</p>
-<p>而且，有了虚拟节点后，还可以为硬件配置更好的节点增加权重，比如对权重更高的节点增加更多的虚拟机节点即可。</p>
-<p>因此，<strong>带虚拟节点的一致性哈希方法不仅适合硬件配置不同的节点的场景，而且适合节点规模会发生变化的场景</strong>。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>不同的负载均衡算法适用的业务场景也不同的。</p>
-<p>轮训这类的策略只能适用与每个节点的数据都是相同的场景，访问任意节点都能请求到数据。但是不适用分布式系统，因为分布式系统意味着数据水平切分到了不同的节点上，访问数据的时候，一定要寻址存储该数据的节点。</p>
-<p>哈希算法虽然能建立数据和节点的映射关系，但是每次在节点数量发生变化的时候，最坏情况下所有数据都需要迁移，这样太麻烦了，所以不适用节点数量变化的场景。</p>
-<p>为了减少迁移的数据量，就出现了一致性哈希算法。</p>
-<p>一致性哈希是指将「存储节点」和「数据」都映射到一个首尾相连的哈希环上，如果增加或者移除一个节点，仅影响该节点在哈希环上顺时针相邻的后继节点，其它数据也不会受到影响。</p>
-<p>但是一致性哈希算法不能够均匀的分布节点，会出现大量请求都集中在一个节点的情况，在这种情况下进行容灾与扩容时，容易出现雪崩的连锁反应。</p>
-<p>为了解决一致性哈希算法不能够均匀的分布节点的问题，就需要引入虚拟节点，对一个真实节点做多个副本。不再将真实节点映射到哈希环上，而是将虚拟节点映射到哈希环上，并将虚拟节点映射到实际节点，所以这里有「两层」映射关系。</p>
-<p>引入虚拟节点后，可以会提高节点的均衡度，还会提高系统的稳定性。所以，带虚拟节点的一致性哈希方法不仅适合硬件配置不同的节点的场景，而且适合节点规模会发生变化的场景。</p>
-
-      
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/ee/2023/09/20/%E4%B8%80%E8%87%B4%E6%80%A7%E5%93%88%E5%B8%8C%E7%AE%97%E6%B3%95review/" rel="prev" title="一致性哈希算法review">
+      <i class="fa fa-chevron-left"></i> 一致性哈希算法review
+    </a></div>
+      <div class="post-nav-item"></div>
     </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
       </footer>
+    
   </article>
   
   
-  
-
-
   
 
 
@@ -555,6 +423,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E9%99%90%E6%B5%81"><span class="nav-number">1.</span> <span class="nav-text">1 限流</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E9%99%90%E6%B5%81%E6%8C%87%E6%A0%87"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 限流指标</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-1-TPS"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1.1 TPS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-2-HPS"><span class="nav-number">1.1.2.</span> <span class="nav-text">1.1.2 HPS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-3-QPS"><span class="nav-number">1.1.3.</span> <span class="nav-text">1.1.3 QPS</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E9%99%90%E6%B5%81%E6%96%B9%E6%B3%95"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 限流方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-1-%E6%B5%81%E9%87%8F%E8%AE%A1%E6%95%B0%E5%99%A8"><span class="nav-number">1.3.</span> <span class="nav-text">1.2.1 流量计数器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-2-%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3"><span class="nav-number">1.4.</span> <span class="nav-text">1.2.2 滑动时间窗口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-3-%E6%BC%8F%E6%A1%B6%E7%AE%97%E6%B3%95"><span class="nav-number">1.5.</span> <span class="nav-text">1.2.3 漏桶算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-4-%E4%BB%A4%E7%89%8C%E6%A1%B6%E7%AE%97%E6%B3%95"><span class="nav-number">1.6.</span> <span class="nav-text">1.2.4 令牌桶算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-5-%E5%88%86%E5%B8%83%E5%BC%8F%E9%99%90%E6%B5%81"><span class="nav-number">1.7.</span> <span class="nav-text">1.2.5 分布式限流</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-6-hystrix%E9%99%90%E6%B5%81"><span class="nav-number">1.8.</span> <span class="nav-text">1.2.6 hystrix限流</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-6-1-%E4%BF%A1%E5%8F%B7%E9%87%8F%E9%99%90%E6%B5%81"><span class="nav-number">1.8.1.</span> <span class="nav-text">1.2.6.1 信号量限流</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-6-2-%E7%BA%BF%E7%A8%8B%E6%B1%A0%E9%99%90%E6%B5%81"><span class="nav-number">1.8.2.</span> <span class="nav-text">1.2.6.2 线程池限流</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E7%86%94%E6%96%AD"><span class="nav-number">2.</span> <span class="nav-text">2 熔断</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E6%96%AD%E8%B7%AF%E5%99%A8%E7%9A%84%E7%8A%B6%E6%80%81"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 断路器的状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E9%9C%80%E8%A6%81%E8%80%83%E8%99%91%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 需要考虑的问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 使用场景</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E6%9C%8D%E5%8A%A1%E9%99%8D%E7%BA%A7"><span class="nav-number">3.</span> <span class="nav-text">3 服务降级</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 使用场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E4%BD%BF%E7%94%A8hystrix%E9%99%8D%E7%BA%A7"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 使用hystrix降级</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-1-%E5%BC%82%E5%B8%B8%E9%99%8D%E7%BA%A7"><span class="nav-number">3.2.1.</span> <span class="nav-text">3.2.1 异常降级</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-2-%E8%B0%83%E7%94%A8%E8%B6%85%E6%97%B6%E9%99%8D%E7%BA%A7"><span class="nav-number">3.2.2.</span> <span class="nav-text">3.2.2 调用超时降级</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
