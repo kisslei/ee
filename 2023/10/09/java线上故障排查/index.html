@@ -20,28 +20,36 @@
     var CONFIG = {"hostname":"kisslei.github.io","root":"/ee/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="https://kisslei.github.io/ee/index.html">
+  <meta name="description" content="引言  线上排查、性能优化等概念也是面试过程中的“常客”，而对于线上遇到的“疑难杂症”，需要通过理性的思维去分析问题、排查问题、定位问题、解决问题，同时，如果解决掉所遇到的问题或瓶颈后，也可以在能力范围之内尝试最优解以及适当考虑拓展性。  在本章中会先讲明线上排查问题的思路，再接着会对于JVM常用的排查工具进行阐述，最后会对于JVM线上常遇的一些故障问题进行全面剖析。  一、JVM线上环境时常见故">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java线上故障排查">
+<meta property="og:url" content="https://kisslei.github.io/ee/2023/10/09/java%E7%BA%BF%E4%B8%8A%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="引言  线上排查、性能优化等概念也是面试过程中的“常客”，而对于线上遇到的“疑难杂症”，需要通过理性的思维去分析问题、排查问题、定位问题、解决问题，同时，如果解决掉所遇到的问题或瓶颈后，也可以在能力范围之内尝试最优解以及适当考虑拓展性。  在本章中会先讲明线上排查问题的思路，再接着会对于JVM常用的排查工具进行阐述，最后会对于JVM线上常遇的一些故障问题进行全面剖析。  一、JVM线上环境时常见故">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://kisslei.github.io/ee/images/pic3.png">
+<meta property="og:image" content="https://kisslei.github.io/ee/images/pic4.png">
+<meta property="og:image" content="https://kisslei.github.io/ee/images/pic5.png">
+<meta property="article:published_time" content="2023-10-09T09:41:42.000Z">
+<meta property="article:modified_time" content="2024-01-09T09:48:35.042Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://kisslei.github.io/ee/images/pic3.png">
 
-<link rel="canonical" href="https://kisslei.github.io/ee/">
+<link rel="canonical" href="https://kisslei.github.io/ee/2023/10/09/java%E7%BA%BF%E4%B8%8A%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/">
 
 
 <script id="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome : true,
-    isPost : false,
+    isHome : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>Hexo</title>
+  <title>java线上故障排查 | Hexo</title>
   
 
 
@@ -139,9 +147,10 @@
         <div class="content-wrap">
           
 
-          <div class="content index posts-expand">
+          <div class="content post posts-expand">
             
-      
+
+    
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
@@ -157,10 +166,9 @@
       <meta itemprop="name" content="Hexo">
     </span>
       <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/ee/2023/10/09/java%E7%BA%BF%E4%B8%8A%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/" class="post-title-link" itemprop="url">java线上故障排查</a>
-        </h2>
+        <h1 class="post-title" itemprop="name headline">
+          java线上故障排查
+        </h1>
 
         <div class="post-meta">
             <span class="post-meta-item">
@@ -190,7 +198,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>  线上排查、性能优化等概念也是面试过程中的“常客”，而对于线上遇到的“疑难杂症”，需要通过理性的思维去分析问题、排查问题、定位问题、解决问题，同时，如果解决掉所遇到的问题或瓶颈后，也可以在能力范围之内尝试最优解以及适当考虑拓展性。</p>
+        <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>  线上排查、性能优化等概念也是面试过程中的“常客”，而对于线上遇到的“疑难杂症”，需要通过理性的思维去分析问题、排查问题、定位问题、解决问题，同时，如果解决掉所遇到的问题或瓶颈后，也可以在能力范围之内尝试最优解以及适当考虑拓展性。</p>
 <blockquote>
 <p>在本章中会先讲明线上排查问题的思路，再接着会对于JVM常用的排查工具进行阐述，最后会对于JVM线上常遇的一些故障问题进行全面剖析。</p>
 </blockquote>
@@ -647,376 +655,30 @@
 <p><strong>分析问题、排查问题、定位问题、解决问题、尝试最优解</strong></p>
 </blockquote>
 
-      
     </div>
 
     
     
     
+
       <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://kisslei.github.io/ee/2023/09/27/%E9%99%90%E6%B5%81/">
+        
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/ee/images/avatar.gif">
-      <meta itemprop="name" content="John Doe">
-      <meta itemprop="description" content="">
-    </span>
 
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hexo">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/ee/2023/09/27/%E9%99%90%E6%B5%81/" class="post-title-link" itemprop="url">限流</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-09-27 11:01:42" itemprop="dateCreated datePublished" datetime="2023-09-27T11:01:42+08:00">2023-09-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-01-04 11:39:02" itemprop="dateModified" datetime="2024-01-04T11:39:02+08:00">2024-01-04</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>在分布式系统中，如果某个服务节点发生故障或者网络发生异常，都有可能导致调用方被阻塞等待，如果超时时间设置很长，调用方资源很可能被耗尽。这又导致了调用方的上游系统发生资源耗尽的情况，最终导致系统雪崩。</p>
-<p>如下图：</p>
-<p><img src="/ee/images/3d56ead76504451a9b919df932ec22de.png" alt="微信图片_20221212182819.png">如果<code>D</code>服务发生了故障不能响应，<code>B</code>服务调用<code>D</code>时只能阻塞等待。假如<code>B</code>服务调用<code>D</code>服务设置超时时间是<code>10</code>秒，请求速率是每秒<code>100</code>个，那<code>10</code>秒内就会有<code>1000</code>个请求线程被阻塞等待，如果<code>B</code>的线程池大小设置<code>1000</code>，那<code>B</code>系统因为线程资源耗尽已经不能对外提供服务了。而这又影响了入口系统<code>A</code>的服务，最终导致系统全面崩溃。</p>
-<p>提高系统的整体容错能力是防止系统雪崩的有效手段。</p>
-<p>在<code>Martin Fowler</code>和<code>James Lewis</code>的文章 《Microservices: a definition of this new architectural term》[1]中，提出了微服务的<code>9</code>个特征，其中一个是容错设计。</p>
-<p>要防止系统发生雪崩，就必须要有容错设计。如果遇到突增流量，一般的做法是对非核心业务功能采用熔断和服务降级的措施来保护核心业务功能正常服务，而对于核心功能服务，则需要采用限流的措施。</p>
-<p>今天我们来聊一聊系统容错中的限流、熔断和服务降级。</p>
-<h2 id="1-限流"><a href="#1-限流" class="headerlink" title="1 限流"></a>1 限流</h2><p>当系统的处理能力不能应对外部请求的突增流量时，为了不让系统奔溃，必须采取限流的措施。</p>
-<h3 id="1-1-限流指标"><a href="#1-1-限流指标" class="headerlink" title="1.1 限流指标"></a>1.1 限流指标</h3><h4 id="1-1-1-TPS"><a href="#1-1-1-TPS" class="headerlink" title="1.1.1 TPS"></a>1.1.1 TPS</h4><p>系统吞吐量是衡量系统性能的关键指标，按照事务的完成数量来限流是最合理的。</p>
-<p>但是对实操性来说，按照事务来限流并不现实。在分布式系统中完成一笔事务需要多个系统的配合。比如我们在电商系统购物，需要订单、库存、账户、支付等多个服务配合完成，有的服务需要异步返回，这样完成一笔事务花费的时间可能会很长。如果按照<code>TPS</code>来进行限流，时间粒度可能会很大大，很难准确评估系统的响应性能。</p>
-<h4 id="1-1-2-HPS"><a href="#1-1-2-HPS" class="headerlink" title="1.1.2 HPS"></a>1.1.2 HPS</h4><p>每秒请求数，指每秒钟服务端收到客户端的请求数量。</p>
-<blockquote>
-<p>❝如果一个请求完成一笔事务，那<code>TPS</code>和<code>HPS</code>是等同的。但在分布式场景下，完成一笔事务可能需要多次请求，所以<code>TPS</code>和<code>HPS</code>指标不能等同看待。❞</p>
-</blockquote>
-<h4 id="1-1-3-QPS"><a href="#1-1-3-QPS" class="headerlink" title="1.1.3 QPS"></a>1.1.3 QPS</h4><p>服务端每秒能够响应的客户端查询请求数量。</p>
-<blockquote>
-<p>❝如果后台只有一台服务器，那<code>HPS</code>和<code>QPS</code>是等同的。但是在分布式场景下，每个请求需要多个服务器配合完成响应。❞</p>
-<p>❝目前主流的限流方法多采用<code>HPS</code>作为限流指标。❞</p>
-</blockquote>
-<h3 id="1-2-限流方法"><a href="#1-2-限流方法" class="headerlink" title="1.2 限流方法"></a>1.2 限流方法</h3><h3 id="1-2-1-流量计数器"><a href="#1-2-1-流量计数器" class="headerlink" title="1.2.1 流量计数器"></a>1.2.1 流量计数器</h3><p>这是最简单直接的方法，比如限制每秒请求数量<code>100</code>，超过<code>100</code>的请求就拒绝掉。</p>
-<p>但是这个方法存在<code>2</code>个明显的问题：</p>
-<ul>
-<li>单位时间(比如<code>1s</code>)很难把控，如下图：</li>
-</ul>
-<p><img src="/ee/images/19612784ae8945bb88fb179bb423521f.png" alt="微信图片_20221212182912.png"></p>
-<ul>
-<li>这张图上，从下面时间看，<code>HPS</code>没有超过<code>100</code>，但是从上面看<code>HPS</code>超过<code>100</code>了。</li>
-<li>有一段时间流量超了，也不一定真的需要限流，如下图，系统<code>HPS</code>限制<code>50</code>，虽然前<code>3s</code>流量超了，但是如果读超时时间设置为<code>5s</code>，并不需要限流。</li>
-</ul>
-<p><img src="/ee/images/c6f19c27138d4f14a1f9bf77d619534b.png" alt="微信图片_20221212182933.png"></p>
-<h3 id="1-2-2-滑动时间窗口"><a href="#1-2-2-滑动时间窗口" class="headerlink" title="1.2.2 滑动时间窗口"></a>1.2.2 滑动时间窗口</h3><p>滑动时间窗口算法是目前比较流行的限流算法，主要思想是把时间看做是一个向前滚动的窗口，如下图：</p>
-<p><img src="/ee/images/380a9c506a654f39b4ca25f00dae57a3.png" alt="微信图片_20221212182955.png"></p>
-<p>开始的时候，我们把<code>t1~t5</code>看做一个时间窗口，每个窗口<code>1s</code>，如果我们定的限流目标是每秒<code>50</code>个请求，那<code>t1~t5</code>这个窗口的请求总和不能超过<code>250</code>个。</p>
-<p>这个窗口是滑动的，下一秒的窗口成了<code>t2~t6</code>，这时把<code>t1</code>时间片的统计抛弃，加入<code>t6</code>时间片进行统计。这段时间内的请求数量也不能超过<code>250</code>个。</p>
-<p>滑动时间窗口的优点是解决了流量计数器算法的缺陷，但是也有<code>2</code>个问题：</p>
-<ul>
-<li>流量超过就必须抛弃或者走降级逻辑</li>
-<li>对流量控制不够精细，不能限制集中在短时间内的流量，也不能削峰填谷</li>
-</ul>
-<h3 id="1-2-3-漏桶算法"><a href="#1-2-3-漏桶算法" class="headerlink" title="1.2.3 漏桶算法"></a>1.2.3 漏桶算法</h3><p>漏桶算法的思想如下图：</p>
-<p><img src="/ee/images/c42a66ebb1724034bca9389684217773.png" alt="微信图片_20221212183016.png"></p>
-<p>在客户端的请求发送到服务器之前，先用漏桶缓存起来，这个漏桶可以是一个长度固定的队列，这个队列中的请求均匀的发送到服务端。</p>
-<p>如果客户端的请求速率太快，漏桶的队列满了，就会被拒绝掉，或者走降级处理逻辑。这样服务端就不会受到突发流量的冲击。</p>
-<p>漏桶算法的优点是实现简单，可以使用消息队列来削峰填谷。</p>
-<p>但是也有<code>3</code>个问题需要考虑:</p>
-<ul>
-<li>漏桶的大小，如果太大，可能给服务端带来较大处理压力，太小可能会有大量请求被丢弃。</li>
-<li>漏桶给服务端的请求发送速率。</li>
-<li>使用缓存请求的方式，会使请求响应时间变长。</li>
-</ul>
-<blockquote>
-<p>❝</p>
-<p>漏桶大小和发送速率这<code>2</code>个值在项目上线初期都会根据测试结果选择一个值，但是随着架构的改进和集群的伸缩，这<code>2</code>个值也会随之发生改变。</p>
-<p>❞</p>
-</blockquote>
-<h3 id="1-2-4-令牌桶算法"><a href="#1-2-4-令牌桶算法" class="headerlink" title="1.2.4 令牌桶算法"></a>1.2.4 令牌桶算法</h3><p>令牌桶算法就跟病人去医院看病一样，找医生之前需要先挂号，而医院每天放的号是有限的。当天的号用完了，第二天又会放一批号。</p>
-<p>算法的基本思想就是周期性的执行下面的流程：</p>
-<p><img src="/ee/images/5b70860d00c347f580ccc4bfb46828bf.png" alt="微信图片_20221212183039.png"></p>
-<p>客户端在发送请求时，都需要先从令牌桶中获取令牌，如果取到了，就可以把请求发送给服务端，取不到令牌，就只能被拒绝或者走服务降级的逻辑。如下图：</p>
-<p><img src="/ee/images/5df00778d38c4074a2f3c94716b2aed3.png" alt="微信图片_20221212183103.png"></p>
-<p>令牌桶算法解决了漏桶算法的问题，而且实现并不复杂，使用信号量就可以实现。在实际限流场景中使用最多，比如<code>google</code>的<code>guava</code>中就实现了令牌桶算法限流，感兴趣可以研究一下。</p>
-<blockquote>
-<p>❞</p>
-</blockquote>
-<h3 id="1-2-5-分布式限流"><a href="#1-2-5-分布式限流" class="headerlink" title="1.2.5 分布式限流"></a>1.2.5 分布式限流</h3><p>如果在分布式系统场景下，上面介绍的<code>4</code>种限流算法是否还适用呢？</p>
-<p>以令牌桶算法为例，假如在电商系统中客户下了一笔订单，如下图：</p>
-<p><img src="/ee/images/aa7f2a81e89540cabc8aef5db49f51f9.png" alt="微信图片_20221212183126.png"></p>
-<p>如果我们把令牌桶单独保存在一个地方(比如<code>redis</code>中)供整个分布式系统用，那客户端在调用组合服务，组合服务调用订单、库存和账户服务都需要跟令牌桶交互，交互次数明显增加了很多。</p>
-<p>有一种改进就是客户端调用组合服务之前首先获取四个令牌，调用组合服务时减去一个令牌并且传递给组合服务三个令牌，组合服务调用下面三个服务时依次消耗一个令牌。</p>
-<h3 id="1-2-6-hystrix限流"><a href="#1-2-6-hystrix限流" class="headerlink" title="1.2.6 hystrix限流"></a>1.2.6 hystrix限流</h3><p>hystrix可以使用信号量和线程池来进行限流。</p>
-<h4 id="1-2-6-1-信号量限流"><a href="#1-2-6-1-信号量限流" class="headerlink" title="1.2.6.1 信号量限流"></a>1.2.6.1 信号量限流</h4><p><code>hystrix</code>可以使用信号量进行限流，比如在提供服务的方法上加下面的注解。这样只能有20个并发线程来访问这个方法，超过的就被转到了errMethod这个降级方法。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@HystrixCommand(</span><br><span class="line"> commandProperties= &#123;</span><br><span class="line">   @HystrixProperty(name=&quot;execution.isolation.strategy&quot;, value=&quot;SEMAPHORE&quot;),</span><br><span class="line">   @HystrixProperty(name=&quot;execution.isolation.semaphore.maxConcurrentRequests&quot;, value=&quot;20&quot;)</span><br><span class="line"> &#125;,</span><br><span class="line"> fallbackMethod = &quot;errMethod&quot;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-
-<h4 id="1-2-6-2-线程池限流"><a href="#1-2-6-2-线程池限流" class="headerlink" title="1.2.6.2 线程池限流"></a>1.2.6.2 线程池限流</h4><p><code>hystrix</code>也可以使用线程池进行限流，在提供服务的方法上加下面的注解，当线程数量</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">@HystrixCommand(</span><br><span class="line">    commandProperties = &#123;</span><br><span class="line">            @HystrixProperty(name = &quot;execution.isolation.strategy&quot;, value = &quot;THREAD&quot;)</span><br><span class="line">    &#125;,</span><br><span class="line">    threadPoolKey = &quot;createOrderThreadPool&quot;,</span><br><span class="line">    threadPoolProperties = &#123;</span><br><span class="line">            @HystrixProperty(name = &quot;coreSize&quot;, value = &quot;20&quot;),</span><br><span class="line">   @HystrixProperty(name = &quot;maxQueueSize&quot;, value = &quot;100&quot;),</span><br><span class="line">            @HystrixProperty(name = &quot;maximumSize&quot;, value = &quot;30&quot;),</span><br><span class="line">            @HystrixProperty(name = &quot;queueSizeRejectionThreshold&quot;, value = &quot;120&quot;)</span><br><span class="line">    &#125;,</span><br><span class="line">    fallbackMethod = &quot;errMethod&quot;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>❝</p>
-<p>这里要注意：在<code>java</code>的线程池中，如果线程数量超过<code>coreSize</code>，创建线程请求会优先进入队列，如果队列满了，就会继续创建线程直到线程数量达到<code>maximumSize</code>，之后走拒绝策略。但在hystrix配置的线程池中多了一个参数<code>queueSizeRejectionThreshold</code>，如果<code>queueSizeRejectionThreshold &lt; maxQueueSize</code>,队列数量达到<code>queueSizeRejectionThreshold</code>就会走拒绝策略了，因此<code>maximumSize</code>失效了。如果<code>queueSizeRejectionThreshold &gt; maxQueueSize</code>,队列数量达到<code>maxQueueSize</code>时，<code>maximumSize</code>是有效的，系统会继续创建线程直到数量达到<code>maximumSize</code>。Hytrix线程池设置坑[2]</p>
-<p>❞</p>
-</blockquote>
-<h2 id="2-熔断"><a href="#2-熔断" class="headerlink" title="2 熔断"></a>2 熔断</h2><p>相信大家对断路器并不陌生，它就相当于一个开关，打开后可以阻止流量通过。比如保险丝，当电流过大时，就会熔断，从而避免元器件损坏。</p>
-<p>服务熔断是指调用方访问服务时通过断路器做代理进行访问，断路器会持续观察服务返回的成功、失败的状态，当失败超过设置的阈值时断路器打开，请求就不能真正地访问到服务了。</p>
-<p>为了更好地理解，我画了下面的时序图：</p>
-<p><img src="/ee/images/f4d7bb34babf48878c5c35c58f946c76.png" alt="微信图片_20221212183221.png"></p>
-<p>可以参考<code>Martin Fowler</code>的论文《CircuitBreaker》[3]。</p>
-<h3 id="2-1-断路器的状态"><a href="#2-1-断路器的状态" class="headerlink" title="2.1 断路器的状态"></a>2.1 断路器的状态</h3><p>断路器有<code>3</code>种状态：</p>
-<ul>
-<li><code>CLOSED</code>：默认状态。断路器观察到请求失败比例没有达到阈值，断路器认为被代理服务状态良好。</li>
-<li><code>OPEN</code>：断路器观察到请求失败比例已经达到阈值，断路器认为被代理服务故障，打开开关，请求不再到达被代理的服务，而是快速失败。</li>
-<li><code>HALF OPEN</code>：断路器打开后，为了能自动恢复对被代理服务的访问，会切换到半开放状态，去尝试请求被代理服务以查看服务是否已经故障恢复。如果成功，会转成<code>CLOSED</code>状态，否则转到<code>OPEN</code>状态。</li>
-</ul>
-<p>断路器的状态切换图如下：</p>
-<p><img src="/ee/images/34614ba464b54aed8626b408e07b04bc.png" alt="微信图片_20221212183257.png"></p>
-<h3 id="2-2-需要考虑的问题"><a href="#2-2-需要考虑的问题" class="headerlink" title="2.2 需要考虑的问题"></a>2.2 需要考虑的问题</h3><p>使用断路器需要考虑一些问题：</p>
-<ul>
-<li>针对不同的异常，定义不同的熔断后处理逻辑。</li>
-<li>设置熔断的时长，超过这个时长后切换到<code>HALF OPEN</code>进行重试。</li>
-<li>记录请求失败日志，供监控使用。</li>
-<li>主动重试，比如对于<code>connection timeout</code>造成的熔断，可以用异步线程进行网络检测，比如<code>telenet</code>，检测到网络畅通时切换到<code>HALF OPEN</code>进行重试。</li>
-<li>补偿接口，断路器可以提供补偿接口让运维人员手工关闭。</li>
-<li>重试时，可以使用之前失败的请求进行重试，但一定要注意业务上是否允许这样做。</li>
-</ul>
-<h3 id="2-3-使用场景"><a href="#2-3-使用场景" class="headerlink" title="2.3 使用场景"></a>2.3 使用场景</h3><ul>
-<li>服务故障或者升级时，让客户端快速失败</li>
-<li>失败处理逻辑容易定义</li>
-<li>响应耗时较长，客户端设置的<code>read timeout</code>会比较长，防止客户端大量重试请求导致的连接、线程资源不能释放</li>
-</ul>
-<h2 id="3-服务降级"><a href="#3-服务降级" class="headerlink" title="3 服务降级"></a>3 服务降级</h2><p>前面讲了限流和熔断，相比来说，服务降级是站在系统全局的视角来考虑的。</p>
-<p>在服务发生熔断后，一般会让请求走事先配置的处理方法，这个处理方法就是一个降级逻辑。</p>
-<p>服务降级是对非核心、非关键的服务进行降级。</p>
-<h3 id="3-1-使用场景"><a href="#3-1-使用场景" class="headerlink" title="3.1 使用场景"></a>3.1 使用场景</h3><ul>
-<li>服务处理异常，把异常信息直接反馈给客户端，不再走其他逻辑</li>
-<li>服务处理异常，把请求缓存下来，给客户端返回一个中间态，事后再重试缓存的请求</li>
-<li>监控系统检测到突增流量，为了避免非核心业务功能耗费系统资源，关闭这些非核心功能</li>
-<li>数据库请求压力大，可以考虑返回缓存中的数据</li>
-<li>对于耗时的写操作，可以改为异步写</li>
-<li>暂时关闭跑批任务，以节省系统资源</li>
-</ul>
-<h3 id="3-2-使用hystrix降级"><a href="#3-2-使用hystrix降级" class="headerlink" title="3.2 使用hystrix降级"></a>3.2 使用hystrix降级</h3><h4 id="3-2-1-异常降级"><a href="#3-2-1-异常降级" class="headerlink" title="3.2.1 异常降级"></a>3.2.1 异常降级</h4><p>hystrix降级时可以忽略某个异常，在方法上加上<code>@HystrixCommand</code>注解：</p>
-<p>下面的代码定义降级方法是<code>errMethod</code>，对<code>ParamErrorException</code>和<code>BusinessTypeException</code>这两个异常不做降级处理。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">@HystrixCommand(</span><br><span class="line"> fallbackMethod = &quot;errMethod&quot;,</span><br><span class="line"> ignoreExceptions = &#123;ParamErrorException.class, BusinessTypeException.class&#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-
-<h4 id="3-2-2-调用超时降级"><a href="#3-2-2-调用超时降级" class="headerlink" title="3.2.2 调用超时降级"></a>3.2.2 调用超时降级</h4><p>专门针对调用第三方接口超时降级。</p>
-<p>下面的方法是调用第三方接口3秒未收到响应就降级到errMethod方法。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@HystrixCommand(</span><br><span class="line">    commandProperties = &#123;</span><br><span class="line">            @HystrixProperty(name=&quot;execution.timeout.enabled&quot;, value=&quot;true&quot;),</span><br><span class="line">            @HystrixProperty(name=&quot;execution.isolation.thread.timeoutInMilliseconds&quot;, value=&quot;3000&quot;),</span><br><span class="line">    &#125;,</span><br><span class="line">    fallbackMethod = &quot;errMethod&quot;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>限流、熔断和服务降级是系统容错的重要设计模式，从一定意义上讲限流和熔断也是一种服务降级的手段。</p>
-<p>熔断和服务降级主要是针对非核心业务功能，而核心业务如果流程超过预估的峰值，就需要进行限流。</p>
-<p>对于限流，选择合理的限流算法很重要，令牌桶算法优势很明显，也是使用最多的限流算法。</p>
-<p>在系统设计的时候，这些模式需要配合业务量的预估、性能测试的数据进行相应阈值的配置，而这些阈值最好保存在配置中心，方便实时修改。</p>
-
-      
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/ee/2023/09/27/%E9%99%90%E6%B5%81/" rel="prev" title="限流">
+      <i class="fa fa-chevron-left"></i> 限流
+    </a></div>
+      <div class="post-nav-item"></div>
     </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
       </footer>
+    
   </article>
   
   
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://kisslei.github.io/ee/2023/09/20/%E4%B8%80%E8%87%B4%E6%80%A7%E5%93%88%E5%B8%8C%E7%AE%97%E6%B3%95review/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/ee/images/avatar.gif">
-      <meta itemprop="name" content="John Doe">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hexo">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/ee/2023/09/20/%E4%B8%80%E8%87%B4%E6%80%A7%E5%93%88%E5%B8%8C%E7%AE%97%E6%B3%95review/" class="post-title-link" itemprop="url">一致性哈希算法review</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-09-20 21:37:59" itemprop="dateCreated datePublished" datetime="2023-09-20T21:37:59+08:00">2023-09-20</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-01-04 11:02:12" itemprop="dateModified" datetime="2024-01-04T11:02:12+08:00">2024-01-04</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <blockquote>
-<p><strong>摘要：</strong>一致性哈希是什么，使用场景，解决了什么问题？</p>
-</blockquote>
-<h2 id="如何分配请求？"><a href="#如何分配请求？" class="headerlink" title="如何分配请求？"></a>如何分配请求？</h2><p>大多数网站背后肯定不是只有一台服务器提供服务，因为单机的并发量和数据量都是有限的，所以都会用多台服务器构成集群来对外提供服务。</p>
-<p>但是问题来了，现在有那么多个节点（后面统称服务器为节点，因为少一个字），要如何分配客户端的请求呢？</p>
-<p><img src="https://alliance-communityfile-drcn.dbankcdn.com/FileServer/getFile/cmtybbs/029/274/683/0080086000029274683.20220224142345.49748461546026794375751830307421:50540619125246:2800:6BA502A314B8D068475C684AE81A2713EF6CE0D7CF0998C174AE971049A47F27.png" alt="cke_129.png"></p>
-<p>其实这个问题就是「负载均衡问题」。解决负载均衡问题的算法很多，不同的负载均衡算法，对应的就是不同的分配策略，适应的业务场景也不同。</p>
-<p>最简单的方式，引入一个中间的负载均衡层，让它将外界的请求「轮流」的转发给内部的集群。比如集群有 3 个节点，外界请求有 3 个，那么每个节点都会处理 1 个请求，达到了分配请求的目的。</p>
-<p><img src="https://alliance-communityfile-drcn.dbankcdn.com/FileServer/getFile/cmtybbs/029/274/683/0080086000029274683.20220224142345.21441399349563479193282675292368:50540619125246:2800:354AAF58B14AB2A527A30C67D80CF1B3F63DC55873FB7546B841B4C49D93FB7D.png" alt="cke_130.png"></p>
-<p>考虑到每个节点的硬件配置有所区别，我们可以引入权重值，将硬件配置更好的节点的权重值设高，然后根据各个节点的权重值，按照一定比重分配在不同的节点上，让硬件配置更好的节点承担更多的请求，这种算法叫做加权轮询。</p>
-<p>加权轮询算法使用场景是建立在每个节点存储的数据都是相同的前提。所以，每次读数据的请求，访问任意一个节点都能得到结果。</p>
-<p>但是，加权轮询算法是无法应对「分布式系统」的，因为分布式系统中，每个节点存储的数据是不同的。</p>
-<p>当我们想提高系统的容量，就会将数据水平切分到不同的节点来存储，也就是将数据分布到了不同的节点。比如<strong>一个分布式 KV（key-valu） 缓存系统，某个 key 应该到哪个或者哪些节点上获得，应该是确定的</strong>，不是说任意访问一个节点都可以得到缓存结果的。</p>
-<p>因此，我们要想一个能应对分布式系统的负载均衡算法。</p>
-<h2 id="使用哈希算法有什么问题？"><a href="#使用哈希算法有什么问题？" class="headerlink" title="使用哈希算法有什么问题？"></a>使用哈希算法有什么问题？</h2><p>有的同学可能很快就想到了：<strong>哈希算法</strong>。因为对同一个关键字进行哈希计算，每次计算都是相同的值，这样就可以将某个 key 确定到一个节点了，可以满足分布式系统的负载均衡需求。</p>
-<p>哈希算法最简单的做法就是进行取模运算，比如分布式系统中有 3 个节点，基于 hash(key) % 3 公式对数据进行了映射。</p>
-<p>如果客户端要获取指定 key 的数据，通过下面的公式可以定位节点：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">hash</span>(key) % <span class="number">3</span>复制</span><br></pre></td></tr></table></figure>
-
-<p>如果经过上面这个公式计算后得到的值是 0，就说明该 key 需要去第一个节点获取。</p>
-<p>但是有一个很致命的问题，<strong>如果节点数量发生了变化，也就是在对系统做扩容或者缩容时，必须迁移改变了映射关系的数据</strong>，否则会出现查询不到数据的问题。</p>
-<p>举个例子，假设我们有一个由 A、B、C 三个节点组成分布式 KV 缓存系统，基于计算公式 hash(key) % 3 将数据进行了映射，每个节点存储了不同的数据：</p>
-<p><img src="https://alliance-communityfile-drcn.dbankcdn.com/FileServer/getFile/cmtybbs/029/274/683/0080086000029274683.20220224142345.38700718499022062532107242283917:50540619125246:2800:7E9B326301C16DC03E784913AD0D9D09FDA18E55DC89D6D5D083CD7EFC8C428B.png" alt="cke_131.png"></p>
-<p>现在有 3 个查询 key 的请求，分别查询 key-01，key-02，key-03 的数据，这三个 key 分别经过 hash() 函数计算后的值为 hash( key-01) &#x3D; 6、hash( key-02) &#x3D; 7、hash(key-03) &#x3D; 8，然后再对这些值进行取模运算。</p>
-<p>通过这样的哈希算法，每个 key 都可以定位到对应的节点。</p>
-<p><img src="https://alliance-communityfile-drcn.dbankcdn.com/FileServer/getFile/cmtybbs/029/274/683/0080086000029274683.20220224142345.05402320189097569600852130570416:50540619125246:2800:F713B4F253E67DCF4811DF82A1219A5573D213C8A68C64F6A79A681A78CED77B.png" alt="cke_132.png"></p>
-<p>当 3 个节点不能满足业务需求了，这时我们增加了一个节点，节点的数量从 3 变化为 4，意味取模哈希函数中基数的变化，这样会导致<strong>大部分映射关系改变</strong>，如下图：</p>
-<p><img src="https://alliance-communityfile-drcn.dbankcdn.com/FileServer/getFile/cmtybbs/029/274/683/0080086000029274683.20220224142345.08376670921890512447466509274995:50540619125246:2800:C9D67978FC1DCD8CD866E6EC836F18155A3FCC93C91FE29563D72DF915B483AC.png" alt="cke_133.png"></p>
-<p>比如，之前的 hash(key-01) % 3 &#x3D; 0，就变成了 hash(key-01) % 4 &#x3D; 2，查询 key-01 数据时，寻址到了节点 C，而 key-01 的数据是存储在节点 A 上的，不是在节点 C，所以会查询不到数据。</p>
-<p>同样的道理，如果我们对分布式系统进行缩容，比如移除一个节点，也会因为取模哈希函数中基数的变化，可能出现查询不到数据的问题。</p>
-<p>要解决这个问题的办法，就需要我们进行<strong>迁移数据</strong>，比如节点的数量从 3 变化为 4 时，要基于新的计算公式 hash(key) % 4 ，重新对数据和节点做映射。</p>
-<p>假设总数据条数为 M，哈希算法在面对节点数量变化时，**最坏情况下所有数据都需要迁移，所以它的数据迁移规模是 O(M)**，这样数据的迁移成本太高了。</p>
-<p>所以，我们应该要重新想一个新的算法，来避免分布式系统在扩容或者缩容时，发生过多的数据迁移。</p>
-<h2 id="使用一致性哈希算法有什么问题？"><a href="#使用一致性哈希算法有什么问题？" class="headerlink" title="使用一致性哈希算法有什么问题？"></a>使用一致性哈希算法有什么问题？</h2><p>一致性哈希算法就很好地解决了分布式系统在扩容或者缩容时，发生过多的数据迁移的问题。</p>
-<p>一致哈希算法也用了取模运算，但与哈希算法不同的是，哈希算法是对节点的数量进行取模运算，而<strong>一致哈希算法是对 2^32 进行取模运算，是一个固定的值</strong>。</p>
-<p>我们可以把一致哈希算法是对 2^32 进行取模运算的结果值组织成一个圆环，就像钟表一样，钟表的圆可以理解成由 60 个点组成的圆，而此处我们把这个圆想象成由 2^32 个点组成的圆，这个圆环被称为<strong>哈希环</strong>，如下图：</p>
-<p><img src="https://alliance-communityfile-drcn.dbankcdn.com/FileServer/getFile/cmtybbs/029/274/683/0080086000029274683.20220224142345.49905909342456556252594602442636:50540619125246:2800:170C163BD636C9ADF3297312AAB01CC1B658185DA302A7E8F01698350E3EAA3D.png" alt="cke_134.png"></p>
-<p>一致性哈希要进行两步哈希：</p>
-<ul>
-<li>第一步：对存储节点进行哈希计算，也就是对存储节点做哈希映射，比如根据节点的 IP 地址进行哈希；</li>
-<li>第二步：当对数据进行存储或访问时，对数据进行哈希映射；</li>
-</ul>
-<p>所以，<strong>一致性哈希是指将「存储节点」和「数据」都映射到一个首尾相连的哈希环上</strong>。</p>
-<p>问题来了，对「数据」进行哈希映射得到一个结果要怎么找到存储该数据的节点呢？</p>
-<p>答案是，映射的结果值往<strong>顺时针的方向的找到第一个节点</strong>，就是存储该数据的节点。</p>
-<p>举个例子，有 3 个节点经过哈希计算，映射到了如下图的位置：</p>
-<p><img src="https://alliance-communityfile-drcn.dbankcdn.com/FileServer/getFile/cmtybbs/029/274/683/0080086000029274683.20220224142345.64910556948748364995688945396415:50540619125246:2800:B8C389182E8F2C65FDF133067F13969599B59CEB6424775488F3CD5F32E95EE8.png" alt="cke_135.png"></p>
-<p>接着，对要查询的 key-01 进行哈希计算，确定此 key-01 映射在哈希环的位置，然后从这个位置往顺时针的方向找到第一个节点，就是存储该 key-01 数据的节点。</p>
-<p>比如，下图中的 key-01 映射的位置，往顺时针的方向找到第一个节点就是节点 A。</p>
-<p><img src="https://alliance-communityfile-drcn.dbankcdn.com/FileServer/getFile/cmtybbs/029/274/683/0080086000029274683.20220224142345.48925205423244001186833948051174:50540619125246:2800:BAE8DFEED7763C6BCF4BD228794ED5A1EB21AB5BC7949EFAA30396F9E84F83DB.png" alt="cke_136.png"></p>
-<p>所以，当需要对指定 key 的值进行读写的时候，要通过下面 2 步进行寻址：</p>
-<ul>
-<li>首先，对 key 进行哈希计算，确定此 key 在环上的位置；</li>
-<li>然后，从这个位置沿着顺时针方向走，遇到的第一节点就是存储 key 的节点。</li>
-</ul>
-<p>知道了一致哈希寻址的方式，我们来看看，如果增加一个节点或者减少一个节点会发生大量的数据迁移吗？</p>
-<p>假设节点数量从 3 增加到了 4，新的节点 D 经过哈希计算后映射到了下图中的位置：</p>
-<p><img src="https://alliance-communityfile-drcn.dbankcdn.com/FileServer/getFile/cmtybbs/029/274/683/0080086000029274683.20220224142345.44801180464369279645436531216471:50540619125246:2800:644466C0CB4FBC168F5179ADA07E9D885ECABE4203646B0CEF7541AF55DCB792.png" alt="cke_137.png"></p>
-<p>你可以看到，key-01、key-03 都不受影响，只有 key-02 需要被迁移节点 D。</p>
-<p>假设节点数量从 3 减少到了 2，比如将节点 A 移除：</p>
-<p><img src="https://alliance-communityfile-drcn.dbankcdn.com/FileServer/getFile/cmtybbs/029/274/683/0080086000029274683.20220224142345.38020773364432785767431261937035:50540619125246:2800:67D84C4C7F792DC971AC39A2E271C7ADC346E55160B7BE1A4E0B577F7FF09EBF.png" alt="cke_138.png"></p>
-<p>你可以看到，key-02 和 key-03 不会受到影响，只有 key-01 需要被迁移节点 B。</p>
-<p>因此，<strong>在一致哈希算法中，如果增加或者移除一个节点，仅影响该节点在哈希环上顺时针相邻的后继节点，其它数据也不会受到影响</strong>。</p>
-<p>上面这些图中 3 个节点映射在哈希环还是比较分散的，所以看起来请求都会「均衡」到每个节点。</p>
-<p>但是<strong>一致性哈希算法并不保证节点能够在哈希环上分布均匀</strong>，这样就会带来一个问题，会有大量的请求集中在一个节点上。</p>
-<p>比如，下图中 3 个节点的映射位置都在哈希环的右半边：</p>
-<p><img src="https://alliance-communityfile-drcn.dbankcdn.com/FileServer/getFile/cmtybbs/029/274/683/0080086000029274683.20220224142344.29294315601409093906451447835272:50540619125246:2800:F92048CAF2CB881EBC5CD3F8D918363E8CA9D23D925A8977FEEE72013D5F5CEE.png" alt="cke_139.png"></p>
-<p>这时候有一半以上的数据的寻址都会找节点 A，也就是访问请求主要集中的节点 A 上，这肯定不行的呀，说好的负载均衡呢，这种情况一点都不均衡。</p>
-<p>另外，在这种节点分布不均匀的情况下，进行容灾与扩容时，哈希环上的相邻节点容易受到过大影响，容易发生雪崩式的连锁反应。</p>
-<p>比如，上图中如果节点 A 被移除了，当节点 A 宕机后，根据一致性哈希算法的规则，其上数据应该全部迁移到相邻的节点 B 上，这样，节点 B 的数据量、访问量都会迅速增加很多倍，一旦新增的压力超过了节点 B 的处理能力上限，就会导致节点 B 崩溃，进而形成雪崩式的连锁反应。</p>
-<p>所以，<strong>一致性哈希算法虽然减少了数据迁移量，但是存在节点分布不均匀的问题</strong>。</p>
-<h2 id="如何通过虚拟节点提高均衡度？"><a href="#如何通过虚拟节点提高均衡度？" class="headerlink" title="如何通过虚拟节点提高均衡度？"></a>如何通过虚拟节点提高均衡度？</h2><p>要想解决节点能在哈希环上分配不均匀的问题，就是要有大量的节点，节点数越多，哈希环上的节点分布的就越均匀。</p>
-<p>但问题是，实际中我们没有那么多节点。所以这个时候我们就加入<strong>虚拟节点</strong>，也就是对一个真实节点做多个副本。</p>
-<p>具体做法是，<strong>不再将真实节点映射到哈希环上，而是将虚拟节点映射到哈希环上，并将虚拟节点映射到实际节点，所以这里有「两层」映射关系。</strong></p>
-<p>比如对每个节点分别设置 3 个虚拟节点：</p>
-<ul>
-<li>对节点 A 加上编号来作为虚拟节点：A-01、A-02、A-03</li>
-<li>对节点 B 加上编号来作为虚拟节点：B-01、B-02、B-03</li>
-<li>对节点 C 加上编号来作为虚拟节点：C-01、C-02、C-03</li>
-</ul>
-<p>引入虚拟节点后，原本哈希环上只有 3 个节点的情况，就会变成有 9 个虚拟节点映射到哈希环上，哈希环上的节点数量多了 3 倍。</p>
-<p><img src="https://alliance-communityfile-drcn.dbankcdn.com/FileServer/getFile/cmtybbs/029/274/683/0080086000029274683.20220224142344.19849996208846198157435480193581:50540619125246:2800:7635F835F790DD57C3919B22EC549037B8E32A30B597E55AA0D5DD9F9EEDBD51.png" alt="cke_140.png"></p>
-<p>你可以看到，<strong>节点数量多了后，节点在哈希环上的分布就相对均匀了</strong>。这时候，如果有访问请求寻址到「A-01」这个虚拟节点，接着再通过「A-01」虚拟节点找到真实节点 A，这样请求就能访问到真实节点 A 了。</p>
-<p>上面为了方便你理解，每个真实节点仅包含 3 个虚拟节点，这样能起到的均衡效果其实很有限。而在实际的工程中，虚拟节点的数量会大很多，比如 Nginx 的一致性哈希算法，每个权重为 1 的真实节点就含有160 个虚拟节点。</p>
-<p>另外，虚拟节点除了会提高节点的均衡度，还会提高系统的稳定性。<strong>当节点变化时，会有不同的节点共同分担系统的变化，因此稳定性更高</strong>。</p>
-<p>比如，当某个节点被移除时，对应该节点的多个虚拟节点均会移除，而这些虚拟节点按顺时针方向的下一个虚拟节点，可能会对应不同的真实节点，即这些不同的真实节点共同分担了节点变化导致的压力。</p>
-<p>而且，有了虚拟节点后，还可以为硬件配置更好的节点增加权重，比如对权重更高的节点增加更多的虚拟机节点即可。</p>
-<p>因此，<strong>带虚拟节点的一致性哈希方法不仅适合硬件配置不同的节点的场景，而且适合节点规模会发生变化的场景</strong>。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>不同的负载均衡算法适用的业务场景也不同的。</p>
-<p>轮训这类的策略只能适用与每个节点的数据都是相同的场景，访问任意节点都能请求到数据。但是不适用分布式系统，因为分布式系统意味着数据水平切分到了不同的节点上，访问数据的时候，一定要寻址存储该数据的节点。</p>
-<p>哈希算法虽然能建立数据和节点的映射关系，但是每次在节点数量发生变化的时候，最坏情况下所有数据都需要迁移，这样太麻烦了，所以不适用节点数量变化的场景。</p>
-<p>为了减少迁移的数据量，就出现了一致性哈希算法。</p>
-<p>一致性哈希是指将「存储节点」和「数据」都映射到一个首尾相连的哈希环上，如果增加或者移除一个节点，仅影响该节点在哈希环上顺时针相邻的后继节点，其它数据也不会受到影响。</p>
-<p>但是一致性哈希算法不能够均匀的分布节点，会出现大量请求都集中在一个节点的情况，在这种情况下进行容灾与扩容时，容易出现雪崩的连锁反应。</p>
-<p>为了解决一致性哈希算法不能够均匀的分布节点的问题，就需要引入虚拟节点，对一个真实节点做多个副本。不再将真实节点映射到哈希环上，而是将虚拟节点映射到哈希环上，并将虚拟节点映射到实际节点，所以这里有「两层」映射关系。</p>
-<p>引入虚拟节点后，可以会提高节点的均衡度，还会提高系统的稳定性。所以，带虚拟节点的一致性哈希方法不仅适合硬件配置不同的节点的场景，而且适合节点规模会发生变化的场景。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-
   
 
 
@@ -1069,6 +731,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81JVM%E7%BA%BF%E4%B8%8A%E7%8E%AF%E5%A2%83%E6%97%B6%E5%B8%B8%E8%A7%81%E6%95%85%E9%9A%9C%E4%B8%8E%E6%8E%92%E6%9F%A5%E6%80%9D%E8%B7%AF%E5%88%86%E6%9E%90"><span class="nav-number">2.</span> <span class="nav-text">一、JVM线上环境时常见故障与排查思路分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1%E3%80%81%E7%BA%BF%E4%B8%8A%E6%8E%92%E6%9F%A5%E5%8F%8A%E5%85%B6%E8%A7%A3%E5%86%B3%E9%97%AE%E9%A2%98%E7%9A%84%E6%80%9D%E8%B7%AF"><span class="nav-number">2.1.</span> <span class="nav-text">1.1、线上排查及其解决问题的思路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2%E3%80%81%E7%BA%BF%E4%B8%8A%E6%8E%92%E6%9F%A5%E7%9A%84%E6%96%B9%E5%90%91"><span class="nav-number">2.2.</span> <span class="nav-text">1.2、线上排查的方向</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81Java%E6%8F%90%E4%BE%9B%E7%9A%84%E7%A8%8B%E5%BA%8F%E7%9B%91%E6%8E%A7%E5%8F%8A%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98%E5%B7%A5%E5%85%B7"><span class="nav-number">3.</span> <span class="nav-text">二、Java提供的程序监控及性能调优工具</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1%E3%80%81%E8%BF%9B%E7%A8%8B%E7%9B%91%E6%8E%A7%E5%B7%A5%E5%85%B7-jps"><span class="nav-number">3.1.</span> <span class="nav-text">2.1、进程监控工具 - jps</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2%E3%80%81%E9%85%8D%E7%BD%AE%E4%BF%A1%E6%81%AF%E6%9F%A5%E7%9C%8B%E5%B7%A5%E5%85%B7-jinfo"><span class="nav-number">3.2.</span> <span class="nav-text">2.2、配置信息查看工具 - jinfo</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5%E3%80%81%E5%A0%86%E5%86%85%E5%AD%98%E5%BF%AB%E7%85%A7%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7-jhat"><span class="nav-number">3.3.</span> <span class="nav-text">2.5、堆内存快照分析工具 - jhat</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-6%E3%80%81%E5%A0%86%E6%A0%88%E8%B7%9F%E8%B8%AA%E5%B7%A5%E5%85%B7-jstack"><span class="nav-number">3.4.</span> <span class="nav-text">2.6、堆栈跟踪工具 - jstack</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-2%E3%80%81%E7%BA%BF%E4%B8%8A%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98%E5%B0%8F%E7%BB%93"><span class="nav-number">3.4.1.</span> <span class="nav-text">3.2.2、线上内存溢出问题小结</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3%E3%80%81JVM%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F"><span class="nav-number">3.5.</span> <span class="nav-text">3.3、JVM内存泄漏</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-1%E3%80%81JVM%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%8E%92%E6%9F%A5%E5%B0%8F%E5%AE%9E%E6%88%98"><span class="nav-number">3.5.1.</span> <span class="nav-text">3.3.1、JVM内存泄漏排查小实战</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-2%E3%80%81%E7%BA%BF%E4%B8%8A%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E9%97%AE%E9%A2%98%E5%B0%8F%E7%BB%93"><span class="nav-number">3.5.2.</span> <span class="nav-text">3.3.2、线上内存泄漏问题小结</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4%E3%80%81%E4%B8%9A%E5%8A%A1%E7%BA%BF%E7%A8%8B%E6%AD%BB%E9%94%81"><span class="nav-number">3.6.</span> <span class="nav-text">3.4、业务线程死锁</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-4-1%E3%80%81%E7%BA%BF%E4%B8%8A%E6%AD%BB%E9%94%81%E6%8E%92%E6%9F%A5%E5%B0%8F%E5%AE%9E%E6%88%98"><span class="nav-number">3.6.1.</span> <span class="nav-text">3.4.1、线上死锁排查小实战</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-4-2%E3%80%81%E6%AD%BB%E9%94%81%E9%97%AE%E9%A2%98%E5%B0%8F%E7%BB%93"><span class="nav-number">3.6.2.</span> <span class="nav-text">3.4.2、死锁问题小结</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5%E3%80%81%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E5%BC%82%E5%B8%B8%E5%AE%95%E6%9C%BA"><span class="nav-number">3.7.</span> <span class="nav-text">3.5、应用程序异常宕机</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-5-1%E3%80%81%E7%BA%BF%E4%B8%8AJava%E5%BA%94%E7%94%A8%E5%AE%95%E6%9C%BA%E5%A4%84%E7%90%86%E5%B0%8F%E5%AE%9E%E6%88%98"><span class="nav-number">3.7.1.</span> <span class="nav-text">3.5.1、线上Java应用宕机处理小实战</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-5-2%E3%80%81%E7%BA%BF%E4%B8%8AJava%E5%BA%94%E7%94%A8%E5%AE%95%E6%9C%BA%E5%B0%8F%E7%BB%93"><span class="nav-number">3.7.2.</span> <span class="nav-text">3.5.2、线上Java应用宕机小结</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-6%E3%80%81%E7%BA%BF%E7%A8%8B%E9%98%BB%E5%A1%9E-%E5%93%8D%E5%BA%94%E9%80%9F%E5%BA%A6%E5%8F%98%E6%85%A2"><span class="nav-number">3.8.</span> <span class="nav-text">3.6、线程阻塞&#x2F;响应速度变慢</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-7%E3%80%81CPU%E5%88%A9%E7%94%A8%E7%8E%87%E5%B1%85%E9%AB%98%E4%B8%8D%E4%B8%8B%E6%88%96%E9%A3%99%E5%8D%87100"><span class="nav-number">3.9.</span> <span class="nav-text">3.7、CPU利用率居高不下或飙升100%</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-7-1%E3%80%81%E7%BA%BF%E4%B8%8ACPU100-%E6%8E%92%E6%9F%A5%E5%B0%8F%E5%AE%9E%E6%88%98"><span class="nav-number">3.9.1.</span> <span class="nav-text">3.7.1、线上CPU100%排查小实战</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-7-2%E3%80%81CPU100-%E6%8E%92%E6%9F%A5%E5%B0%8F%E7%BB%93"><span class="nav-number">3.9.2.</span> <span class="nav-text">3.7.2、CPU100%排查小结</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-8%E3%80%81%E5%85%B6%E4%BB%96%E7%BA%BF%E4%B8%8A%E9%97%AE%E9%A2%98%E6%B5%85%E8%B0%88"><span class="nav-number">3.10.</span> <span class="nav-text">3.8、其他线上问题浅谈</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E7%BA%BF%E4%B8%8A%E6%8E%92%E6%9F%A5%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">四、线上排查总结</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
